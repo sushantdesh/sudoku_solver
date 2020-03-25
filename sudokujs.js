@@ -103,11 +103,11 @@ function generate_frame() {
 
                     let th = document.createElement("th");
                     let para = document.createElement("p");
-                    para.onclick = function () {
-                        cell(k, l, i, j)
-                    }
+                    // para.onclick = function () {
+                    //     cell(k, l, i, j)
+                    // }
                     para.style.outline = "gray solid 3px";
-                    para.style.color = "white"
+                    para.style.color = "whitesmoke"
                     para.contentEditable = "false"
 
                     let t = document.createTextNode("0");
@@ -122,19 +122,26 @@ function generate_frame() {
 
 }
 
-function cell(a, b, c, d) {
-    console.log("clicked")
-    var maintable = document.getElementById("table1")
-    var current_para = maintable.rows[a].cells[b].childNodes[0].rows[c].cells[d].childNodes[0]
-    current_para.style.background = "blue"
+//
+// function cell(a, b, c, d) {
+//     console.log("clicked")
+//     // var maintable = document.getElementById("table1")
+//     // var current_para = maintable.rows[a].cells[b].childNodes[0].rows[c].cells[d].childNodes[0]
+//     // current_para.style.background = "blue"
+//
+//
+// }
 
-
-}
-
-async function backtrack() {
+// var list1=[]
+function backtrack() {
     if (check_vacant_cells() === "false") {
 
         console.log("Complete")
+        let s = document.getElementById("solve")
+        s.style.color = "whitesmoke"
+        s.style.background = "#4CAF50"
+        s.style.outline = "#4CAF50"
+        s.disabled = false
         return true
     } else {
         let res = check_vacant_cells()
@@ -150,35 +157,24 @@ async function backtrack() {
     var current_para = maintable.rows[a].cells[b].childNodes[0].rows[c].cells[d].childNodes[0]
     for (let i = 1; i < 10; i++) {
         if (g.update(row, col, i)) {
-            disp(a, b, c, d, i, current_para);
-            // remove this part
-            // setTimeout(function () {
-            //     console.log("heyyyy")
-            //     if (backtrack()) {
-            //         return true
-            //     }
-            //
-            // },1000)
-            await setTimeout(()=>{},1000)
-            console.log("helloooo")
-            if (backtrack()) {
-                console.log("true")
-                      return true
-                  }
+            disp(a, b, c, d, i, current_para)
 
+            // list1.push([a,b,c,d,i,current_para])
+
+            if (backtrack()) {
+                return true
+            }
             undisp(row, col, current_para)
         }
     }
-    // console.log("Backtrack2")
-    // current_para.innerHTML = 0
-    // current_para.style.outline = "red solid 3px"
-    // current_para.style.color = "red"
+
     return false
 
 }
 
 
 function disp(a, b, c, d, i, current_para) {
+    // console.log("disp")
     //document.getElementById("nyt1").innerHTML=a
     current_para.innerHTML = i
     current_para.style.outline = "green solid 3px"
@@ -190,12 +186,35 @@ function disp(a, b, c, d, i, current_para) {
 function undisp(row, col, current_para) {
     g.update(row, col, 0)
     current_para.innerHTML = 0
-    current_para.style.color = "white"
-    current_para.style.outline = "gray"
+    current_para.style.color = "whitesmoke"
+    current_para.style.outline = "gray solid 3px"
     return true
 
 }
 
+var vacant = []
+
+function check_vacant_cells_for_list() {
+    for (let aa = 0; aa < 9; aa++) {
+        for (let bb = 0; bb < 9; bb++) {
+
+            if (g.dict[aa][bb] === 0) {
+                vacant.push([aa, bb, 0,[]])
+                for (let i=1;i<10;i++){
+                    if(g.update(aa,bb,i)){
+                        vacant[vacant.length-1][3].push(i)
+
+                    }g.update(aa,bb,0)
+
+
+                }
+
+            }
+        }
+
+    }
+
+}
 
 function check_vacant_cells() {
     for (let aa = 0; aa < 9; aa++) {
@@ -210,23 +229,60 @@ function check_vacant_cells() {
     return "false"
 }
 
-function input() {
-    grid = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+var inter
+async function solve_vis(timeout) {
 
-    populate_frame(grid, "true")
+    check_vacant_cells_for_list()
 
+    var i = 0
+    inter = await setInterval(back, timeout)
+
+    function back() {
+        if (i >= vacant.length) {
+            console.log("hey")
+            vacant.length = 0
+            let s = document.getElementById("solve")
+            s.style.color = "whitesmoke"
+            s.style.background = "#4CAF50"
+            s.style.outline = "#4CAF50"
+            s.disabled = false
+            document.getElementById("myRange").disabled=false
+
+            clearInterval(inter)
+
+        } else {
+            console.log(vacant[i])
+            var a = parseInt(vacant[i][0] / 3, 10)
+            var c = vacant[i][0] % 3
+            var b = parseInt(vacant[i][1] / 3, 10)
+            var d = vacant[i][1] % 3
+            var maintable = document.getElementById("table1")
+            var current_para = maintable.rows[a].cells[b].childNodes[0].rows[c].cells[d].childNodes[0]
+
+            let num = vacant[i][2]
+            if (num>=vacant[i][3].length){
+
+                undisp(vacant[i][0], vacant[i][1], current_para)
+                vacant[i][2] = 0
+                i--
+            } else {
+                if (g.update(vacant[i][0], vacant[i][1], vacant[i][3][num])) {
+                    disp(a, b, c, d, vacant[i][3][num], current_para)
+                    i++
+                } else {
+                    vacant[i][2]++
+                }
+            }
+        }
+
+
+    }
 
 }
 
 function medium() {
+    clearInterval(inter)
+    vacant.length=0
     grid = [[2, 0, 0, 0, 0, 0, 5, 0, 0],
         [0, 5, 8, 0, 0, 0, 0, 0, 0],
         [3, 0, 0, 0, 4, 7, 0, 1, 0],
@@ -241,6 +297,8 @@ function medium() {
 }
 
 function easy() {
+    clearInterval(inter)
+    vacant.length=0
     grid = [[8, 3, 0, 0, 7, 0, 0, 0, 6],
         [0, 0, 9, 3, 0, 1, 5, 0, 2],
         [2, 0, 6, 0, 0, 0, 9, 3, 0],
@@ -257,6 +315,8 @@ function easy() {
 }
 
 function hard() {
+    clearInterval(inter)
+    vacant.length=0
     grid = [[0, 0, 0, 0, 3, 0, 6, 0, 0],
         [6, 0, 5, 0, 0, 0, 0, 0, 0],
         [0, 9, 0, 8, 0, 0, 1, 0, 0],
@@ -273,6 +333,9 @@ function hard() {
 }
 
 function reset() {
+    clearInterval(inter)
+    vacant.length=0
+    console.log("reset")
     grid = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -287,7 +350,7 @@ function reset() {
     populate_frame(grid, "false")
     let s = document.getElementById("solve")
     s.style.color = "gray"
-    s.style.background = "white"
+    s.style.background = "whitesmoke"
     s.style.outline = "gray solid 1px"
     s.disabled = true
 
@@ -323,7 +386,7 @@ function populate_frame(grid, inp) {
                         } else {
 
                             current_para.style.outline = "gray solid 3px"
-                            current_para.style.color = "white"
+                            current_para.style.color = "whitesmoke"
 
                         }
                     } else {
@@ -336,11 +399,37 @@ function populate_frame(grid, inp) {
         }
     }
     let s = document.getElementById("solve")
-    s.style.color = "white"
-    s.style.background = "green"
-    s.style.outline = "green"
+    s.style.color = "whitesmoke"
+    s.style.background = "#4CAF50"
+    s.style.outline = "#4CAF50"
     s.disabled = false
     console.log(g.dict)
     return true
 }
 
+function solve() {
+
+    // Get the checkbox
+    var checkBox = document.getElementById("check");
+    // Get the output text
+
+    // If the checkbox is checked, display the output text
+    if (checkBox.checked == true) {
+        var timeout = document.getElementById("myRange").value
+        document.getElementById("myRange").disabled=true
+
+
+        solve_vis(timeout)
+
+    } else {
+        backtrack()
+    }
+    let s = document.getElementById("solve")
+    s.style.color = "whitesmoke"
+    s.style.background = "gray"
+    s.style.outline = "gray"
+    s.disabled = true
+}
+function speed_value() {
+   document.getElementById("speed_v").innerText =document.getElementById("myRange").value
+}

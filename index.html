@@ -5,55 +5,30 @@
     <title>Sudoku web app</title>
     <meta charset="utf-8"/>
     <script type="text/javascript" src="sudokujs.js"></script>
+    <link rel="stylesheet" type="text/css" href="sudokucss.css">
 
-    <style>
-        p {
 
-            margin: auto;
-            padding: 5px;
-            text-align: center;
-            font-size: 20px;
-        }
-        body {
-            background: #555;
-        }
-        button{
-            display: inline;
-        }
-        table{
-            width: 50%;
-            margin: auto;
-        }
-
-        .content {
-            text-align: center;
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 10px;
-        }
-        /*.center {*/
-        /*    margin: auto;*/
-        /*    !*width: 50%;*!*/
-        /*    background: white;*/
-        /*    border: 3px solid green;*/
-        /*    padding: 10px;*/
-        /*}*/
-
-    </style>
 </head>
 <body onload="generate_frame();">
 <div class="content">
 <button id="nyt1" onclick="easy()"><h4>Use nytimes sudoku (Easy) 01/12/20</h4></button>
 <button id="nyt2" onclick="medium()"><h4>Use nytimes sudoku (Medium) 01/14/20</h4></button><br><br>
 <button id="nyt3" onclick="hard()"><h4>Use nytimes sudoku (Hard) 01/14/20</h4></button>
-<button id="input" onclick="input()"><h4>Add your own</h4></button><br><br>
+<button id="input" onclick="input()" disabled="disabled"><h4>Scan your own</h4></button><br><br>
+
+    <input type="checkbox" id="check">
+    <label id="visualize">Visualize &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+    <label id="speed">Speed&nbsp;&nbsp;</label>
+    <input type="range" min="0" max="50" value="5" class="slider" id="myRange" onclick="speed_value()">
+    <label id="speed_v">5</label>
+    <br><br>
+
 
 <table border="1" id="table1">
 
 </table>
 <br>
-<button disabled="disabled" id="solve"onclick="backtrack()"><h4>Solve</h4></button>
+<button disabled="disabled" id="solve"onclick="solve()"><h4>Solve</h4></button>
 <button disabled="disabled" id="reset" onclick="reset()"><h4>Reset</h4></button>
 </div>
 </body>
